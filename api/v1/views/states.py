@@ -11,12 +11,12 @@ from models.state import State
 @app_views.route('/states', methods=['GET'], strict_slashes=False)
 def get_states():
     """ Fetches then returns all state objects as a JSON response """
-    objects = storage.all('State')
-    s_list = []
+    state_list = []
+    state_obj = storage.all("State")
+    for obj in state_obj.values():
+        state_list.append(obj.to_json())
 
-    for state in objects.values():
-        s_list.append(state.to_dict())
-    return jsonify(s_list)
+    return jsonify(state_list)
 
 @app_views.route('/states', methods=[POST], strict_slashes=False)
 def create_state():
@@ -42,7 +42,7 @@ def get_state_by_id(state_id):
     if new_obj is None:
         abort(404)
 
-    return jsonify(new_obj.to_dict())
+    return jsonify(new_obj.to_json())
 
 @app_views.route('/states/<state_id>', methods=['PUT'], strict_slashes=False)
 def state_put(state_id):
@@ -60,7 +60,7 @@ def state_put(state_id):
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(new_obj, key, val)
     new_obj.save()
-    return jsonify(new_obj.to_dict())
+    return jsonify(new_obj.to_json())
 
 @app_views.route('/state/<state_id>', methods=['DELETE'], strict_slashes=False)
 def delete_state_by_id(state_id):
