@@ -11,8 +11,7 @@ from models.city import City
                  strict_slashes=False)
 def city_by_state(state_id):
     """
-    retrieves all City objects from a specific state
-    :return: json of all cities in a state or 404 on error
+    Retrieves city objects from a state
     """
     city_list = []
     state_obj = storage.get("State", state_id)
@@ -20,7 +19,7 @@ def city_by_state(state_id):
     if state_obj is None:
         abort(404)
     for obj in state_obj.cities:
-        city_list.append(obj.to_json())
+        city_list.append(obj.to_dict())
 
     return jsonify(city_list)
 
@@ -29,9 +28,7 @@ def city_by_state(state_id):
                  strict_slashes=False)
 def city_create(state_id):
     """
-    create city route
-    param: state_id - state id
-    :return: newly created city obj
+    Create city route
     """
     city_json = request.get_json(silent=True)
     if city_json is None:
@@ -47,7 +44,7 @@ def city_create(state_id):
 
     new_city = City(**city_json)
     new_city.save()
-    resp = jsonify(new_city.to_json())
+    resp = jsonify(new_city.to_dict())
     resp.status_code = 201
 
     return resp
@@ -57,9 +54,7 @@ def city_create(state_id):
                  strict_slashes=False)
 def city_by_id(city_id):
     """
-    gets a specific City object by ID
-    :param city_id: city object id
-    :return: city obj with the specified id or error
+    Gets a city object using its Id
     """
 
     fetched_obj = storage.get("City", str(city_id))
@@ -67,15 +62,13 @@ def city_by_id(city_id):
     if fetched_obj is None:
         abort(404)
 
-    return jsonify(fetched_obj.to_json())
+    return jsonify(fetched_obj.to_dict())
 
 
 @app_views.route("cities/<city_id>",  methods=["PUT"], strict_slashes=False)
 def city_put(city_id):
     """
-    updates specific City object by ID
-    :param city_id: city object ID
-    :return: city object and 200 on success, or 400 or 404 on failure
+    Updates City object using its Id
     """
     city_json = request.get_json(silent=True)
     if city_json is None:
@@ -87,16 +80,14 @@ def city_put(city_id):
         if key not in ["id", "created_at", "updated_at", "state_id"]:
             setattr(fetched_obj, key, val)
     fetched_obj.save()
-    return jsonify(fetched_obj.to_json())
+    return jsonify(fetched_obj.to_dict())
 
 
 @app_views.route("/cities/<city_id>",  methods=["DELETE"],
                  strict_slashes=False)
 def city_delete_by_id(city_id):
     """
-    deletes City by id
-    :param city_id: city object id
-    :return: empty dict with 200 or 404 if not found
+    Deletes City object using its Id
     """
 
     fetched_obj = storage.get("City", str(city_id))
